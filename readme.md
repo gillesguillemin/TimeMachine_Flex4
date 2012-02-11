@@ -1,4 +1,4 @@
-# FLEX 4: ANIMATED TIMEMACHINE LAYOUT
+## FLEX 4: ANIMATED TIMEMACHINE LAYOUT
 
 The new layout architecture in Flex 4 is pretty cool. It’s much much simpler to implement complex layouts than what was possible with Flex 3. So the other day I was asked to develop a TimeMachine-like layout. It eventually ended up being done with Flex 3 but before that I had a chance to give a try with the new layout system.
 
