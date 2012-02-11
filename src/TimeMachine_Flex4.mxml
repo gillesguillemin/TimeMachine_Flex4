@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:mx="library://ns.adobe.com/flex/halo"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:local="*"
+			   xmlns:layouts="layouts.*" viewSourceURL="srcview/index.html">
+
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import spark.events.IndexChangeEvent;
+			import com.greensock.easing.Quart;
+			import com.greensock.TweenLite;
+
+			public function scrollGroup ( n : int ) : void
+			{
+				var scrollPoint : Point = timeMachine.layout.getScrollPositionDeltaToElement( n );
+				var duration : Number = ( Math.max( scrollPoint.y, timeMachine.layout.target.verticalScrollPosition ) - Math.min( scrollPoint.y, timeMachine.layout.target.verticalScrollPosition )) * .005;
+				TweenLite.to( timeMachine.layout, duration, { verticalScrollPosition: scrollPoint.y, ease: Quart.easeOut });
+			}
+
+			protected function timeMachine_caretChangeHandler ( event : IndexChangeEvent ) : void
+			{
+				scrollGroup( event.newIndex );
+				event.target.invalidateDisplayList();
+			}
+
+			protected function timeMachine_creationCompleteHandler () : void
+			{
+				var perspectivePoint : Point = new Point( timeMachine.width * .5, timeMachine.height * .5 );
+				root.transform.perspectiveProjection.projectionCenter = localToGlobal( perspectivePoint );
+			}
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<s:ArrayCollection id="collection">
+			<fx:String>Panel 1</fx:String>
+			<fx:String>Panel 2</fx:String>
+			<fx:String>Panel 3</fx:String>
+			<fx:String>Panel 4</fx:String>
+			<fx:String>Panel 5</fx:String>
+			<fx:String>Panel 6</fx:String>
+			<fx:String>Panel 7</fx:String>
+			<fx:String>Panel 8</fx:String>
+		</s:ArrayCollection>
+	</fx:Declarations>
+
+	<s:List id="timeMachine"
+			itemRenderer="renderers.TimeMachinePanelRenderer"
+			width="100%"
+			height="100%"
+			dataProvider="{collection}"
+			selectedIndex="0"
+			caretChange="timeMachine_caretChangeHandler(event)"
+			creationComplete="callLater(timeMachine_creationCompleteHandler)"
+			scroller="{null}">
+
+		<s:layout>
+			<layouts:TimeMachineLayout id="timeMachineLayout"
+									   distance="{ distanceSlider.value }"
+									   index="{ timeMachine.selectedIndex }"
+									   horizontalDisplacement="{horizontalDisplacementSlider.value}"
+									   verticalDisplacement="{verticalDisplacementSlider.value}" />
+		</s:layout>
+	</s:List>
+
+	<s:VGroup left="10"
+			  verticalCenter="0">
+		<s:List id="panels"
+				selectedIndex="{timeMachine.selectedIndex}"
+				dataProvider="{collection}"
+				change="timeMachine.selectedIndex = event.newIndex" />
+
+		<s:Label text="Index" />
+		<s:HSlider id="indexSlider"
+				   minimum="0"
+				   maximum="{collection.length - 1}"
+				   stepSize="1"
+				   liveDragging="true"
+				   value="@{ timeMachine.selectedIndex }" />
+		<s:HGroup>
+			<s:Button label="Prev"
+					  enabled="{timeMachine.selectedIndex > 0}"
+					  click="timeMachine.selectedIndex -= 1" />
+			<s:Button label="Next"
+					  enabled="{timeMachine.selectedIndex &lt; collection.length - 1}"
+					  click="timeMachine.selectedIndex += 1" />
+		</s:HGroup>
+	</s:VGroup>
+
+	<s:VGroup bottom="10"
+			  horizontalCenter="0">
+		<s:Label text="Distance" />
+		<s:HSlider id="distanceSlider"
+				   minimum="1"
+				   maximum="300"
+				   value="150"
+				   liveDragging="true" />
+		<s:Label text="HorizontalDisplacement" />
+		<s:HSlider id="horizontalDisplacementSlider"
+				   minimum="-100"
+				   maximum="100"
+				   value="0"
+				   liveDragging="true" />
+		<s:Label text="VerticalDisplacement" />
+		<s:HSlider id="verticalDisplacementSlider"
+				   minimum="-100"
+				   maximum="100"
+				   value="-60"
+				   liveDragging="true" />
+	</s:VGroup>
+</s:Application>
